@@ -1,0 +1,79 @@
+:PROPERTIES:
+:ID:       1adb134c-8fcd-414b-b29a-2cdc3ca41a4f
+:END:
+#+title:Open Contracting Data Standard - Exploratory data analysis
+
+* OCDS analysis
+** Briefly describe how the agency can use their data to measure the number of bidders in open procedures. If it isn’t possible, what change(s) would they need to make to their data?
+For each =releases= record in the JSON file, the agency can filter on open procedures through the =tender.procurementMethod= field and count the number of objects listed in =tender.tenderers=.
+
+Alternatively, with the file =tender_2022.csv=, the agency can filter on =procurementMethod= and look at the number in =numberOfTenderers=.
+
+Other details would depend on the agency's use case.
+** Briefly describe how the agency can use their data to measure the participation of women-owned businesses. If it isn’t possible, what change(s) would they need to make to their data?
+Gender of business owners is not currently disclosed in the data, which prevents us from measuring the participation of women-owned businesses.
+
+In order to remedy this oversight, the agency would need to require tenderers to disclose the owner's gender. This information would then be exposed in the =parties= field in =releases=.
+** Perform exploratory analysis in order to share 3 insights about open procedures. (For example, in terms of the distribution of buyers or categories, etc.)
+*** Winner and loser provinces
+[[./assets/regions_roles.png]]
+
+=Bolivar= is an outlier here: we would have expected it to be much closer to the other provinces in terms of number of suppliers depending on number of tenderers coming from this province.
+
+Given that it ranks 10 among the most common regions that tenderers come from, it should have been closer to being 10 for the most common regions for suppliers. Instead, it is 23rd, or second to last.
+
+By contrast, =Sucumbios= is an outlier in the other direction: given how it ranks among tenderers' provinces, the region would have been expected to rank much more poorly among suppliers' provinces.
+
+The agency could use this insight to determine why Bolivar appears so disadvantaged when it comes to open procedures.
+
+Cross-checking this information with [[https://www.scribd.com/document/398970547/Indice-de-Desarrollo-Humano-en-Ecuador][various economic indicators for Ecuador provinces]] might also be an interesting exploration.
+*** Lucky tenderers
+[[./assets/roles_ranks.png]]
+
+This plot is similar to the previous one: we counted all the occurrences where a party has answered a tender and all the occurrences where it became a supplier, and plotted the former against the latter for each party.
+
+Each dot is a party. The further the dot is to the left, the more times the party has answered a tender. The further the dot is to the bottom, the more times the party has become a supplier (ie won the tender). The aligned dots are due to the way we're assigning ranks: all the top line dots have only been a supplier once, and their rank is an average rank. The second line corresponds to the parties that have been a supplier twice, etc.
+
+The chart shows that there is a positive correlation between tendering and being a supplier (getting contracts): the parties that answer tenders the most are also the ones most likely to be winning contracts.
+
+In a competitive process, one would expect that most businesses would have to answer many tenders before getting a contract. This is what we see with almost all the dots being in the top left half of the plot.
+
+By contrast, any party that is often a supplier but doesn't tender often is unlikely to exist in a competitive market: here, we have only a few dots [0] [1] in the bottom right half of the plot. This could mean many things: it could indicate that the business is extremely good at focusing on the tenders it's most likely to win, or that the business has few competitors for the service that it provides, or, of course, that it is benefitting from corruption.
+
+We would have to look into this more to know.
+
+[0]: https://ecuadornegocios.com/info/sacancela-quishpe-robert-cristobal-1749263
+
+[1]: https://ecuadornegocios.com/info/textidor-4379978
+
+*** Common contract amounts
+
+[[./assets/amounts.png]]
+
+This chart aims to show the distribution of contract amounts on open procedures in 2022.
+
+Because the smallest contracts are a few USD, while the few largest are in the dozens of millions of USD, it is easier to see the distribution with a log scale.
+
+Here, we observe that the amounts stated in contracts are clustering around 10k-100k USD, approximatively.
+** Are there any data quality issues that you encountered during your analysis? What would you suggest to address the key issues?
+My quality control of the OCDS data was constrained by time, but I have the following issues:
+- Non-unique =id= values
+  + =contracts=, =suppliers=, and =awards= have many non-unique =id= values: this might be expected for the OCDS format, but is unintuituve, and is not observed in =tender=, =planning=, and =releases=. There also duplicates in =ocid= and =release_id=, but that is expected (multiple awards per tender, for example).
+  + If this is indeed an issue, this could be avoided by adding some data validation checks to the publication pipeline, for example.
+- Duplicates in =bids.details= and =bids.statistics=
+  + In the JSON data, 71% of =bids.details= and 96$ of =bids.statistics= records in the =releases= object consist of duplicate values. This is almost certainly a bug, and it can have severe repercussions by overcounting bids, for example.
+  + This is another issue that could be solved with an automated data validation check before publication.
+- =parties= address
+  + The address in =parties= most often includes the locality (city), but sometimes only the postcode is provided, without the city.
+  + The address format should follow a strict convention, which could be ascertained during data validation
+- =planning.budget.id= format
+  + =planning.budget.id= has a very lenient format (=780204=, =2022.052.0085.0000.91.00.000.001.000.0901.840105.000000.001.0000.0000=, =6.3.08.13=, =730207.01=, etc.). Specifically, this risks being converted to the wrong format (int or float) during data cleaning and interpreted as an amount.
+  + This can be solved by standardising the format.
+- Potentially missing information
+  + This is not necessarily a quality issue, as it might be voluntary, but some of the information outlined in the [[https://standard.open-contracting.org/latest/en/schema/reference/][Release Reference]] on Open Contracting docs (implementation, milestones, etc.) does not seem to be available here.
+** Are there any issues with their data access methods? Do you have suggestions for improving their data access methods?
+I have identified a few issues with the API:
+- The documentation of the =https://datosabiertos.compraspublicas.gob.ec/PLATAFORMA/api/search_ocds= endpoint is wrong
+  + The example provided does not work
+  + The =search= parameter is not mandatory, contrary to the documentation
+- The =https://datosabiertos.compraspublicas.gob.ec/PLATAFORMA/api/record= API endpoint is broken, or only accessing a subset of data, as implied by several unsuccessful attempts at querying it with different =ocid= values.
