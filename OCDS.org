@@ -30,13 +30,13 @@ Cross-checking this information with [[https://www.scribd.com/document/398970547
 *** Lucky tenderers
 [[./assets/roles_ranks.png]]
 
-This plot is similar to the previous one: we counted all the occurrences where a party has answered a tender and all the occurrences where it became a supplier, and plotted the former against the latter for each party.
+This plot is similar to the previous one: we counted all the occurrences where a party has bid on a tender and all the occurrences where it became a supplier, and plotted the former against the latter for each party.
 
-Each dot is a party. The further the dot is to the left, the more times the party has answered a tender. The further the dot is to the bottom, the more times the party has become a supplier (ie won the tender). The aligned dots are due to the way we're assigning ranks: all the top line dots have only been a supplier once, and their rank is an average rank. The second line corresponds to the parties that have been a supplier twice, etc.
+Each dot is a party. The further the dot is to the left, the more times the party has bid on a tender. The further the dot is to the bottom, the more times the party has become a supplier (ie won the tender). The aligned dots are due to the way we're assigning ranks: all the top line dots have only been a supplier once, and their rank is an average rank. The second line corresponds to the parties that have been a supplier twice, etc.
 
-The chart shows that there is a positive correlation between tendering and being a supplier (getting contracts): the parties that answer tenders the most are also the ones most likely to be winning contracts.
+The chart shows that there is a positive correlation between tendering and being a supplier (getting contracts): the parties that bid on tenders the most are also the ones most likely to be winning contracts.
 
-In a competitive process, one would expect that most businesses would have to answer many tenders before getting a contract. This is what we see with almost all the dots being in the top left half of the plot.
+In a competitive process, one would expect that most businesses would have to bid on many tenders before getting a contract. This is what we see with almost all the dots being in the top left half of the plot.
 
 By contrast, any party that is often a supplier but doesn't tender often is unlikely to exist in a competitive market: here, we have only a few dots [0] [1] in the bottom right half of the plot. This could mean many things: it could indicate that the business is extremely good at focusing on the tenders it's most likely to win, or that the business has few competitors for the service that it provides, or, of course, that it is benefitting from corruption.
 
